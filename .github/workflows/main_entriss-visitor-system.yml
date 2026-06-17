@@ -12,7 +12,6 @@ jobs:
     permissions:
       contents: read
 
-    # Set environment variables for the entire build job
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
@@ -25,13 +24,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
-          cache: 'npm'          # Improves speed on subsequent builds
+          cache: 'npm'
 
-      - name: Install dependencies, generate Prisma Client & Build
+      - name: Install dependencies and build
         run: |
           npm ci
           npm run build
-        # No need for extra env here since it's defined at job level
+
+      - name: Verify Next installation
+        run: |
+          echo "===== CHECK NEXT ====="
+          ls -la node_modules/.bin
+
+          echo ""
+          echo "===== CHECK NEXT PACKAGE ====="
+          ls -la node_modules/next
+
+          echo ""
+          echo "===== CHECK NEXT VERSION ====="
+          npx next --version
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
