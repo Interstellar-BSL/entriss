@@ -1,0 +1,861 @@
+// =============================================================================
+// Entriss — Production Prisma Schema
+// Multi-tenant Visitor Management System
+//
+// Tenancy: shared PostgreSQL, row-level isolation via organizationId on every
+// tenant-owned table. Phase 7.1 adds OrgStatus/MemberStatus, optional system
+// roles (Role.organizationId nullable), and default-org bootstrap.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// AUTHENTICATION (NextAuth v4 — global identity, not tenant-scoped)
+// =============================================================================
+
+/// Platform-level role for users who operate across all tenants.
+enum SystemRole {
+  SYSTEM_OWNER
+  PLATFORM_ADMIN
+}
+
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique @db.VarChar(320)
+  emailVerified DateTime?
+  name          String?     @db.VarChar(255)
+  image         String?
+  passwordHash  String?
+  systemRole                 SystemRole?
+  lastActiveOrganizationId   String?
+  /// Optional external identity reference (SSO / auth provider subject).
+  authProviderId             String?     @db.VarChar(255)
+  isActive                   Boolean     @default(true)
+  lastLoginAt                DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  accounts Account[]
+  sessions Session[]
+  notifications AppNotification[]
+
+  memberships OrganizationMember[]
+  sentInvites OrganizationInvite[] @relation("InviteSender")
+  visitEvents VisitEvent[]
+  auditLogs   AuditLog[]
+  visitsCheckedIn  Visit[] @relation("VisitCheckedInBy")
+  visitsCheckedOut Visit[] @relation("VisitCheckedOutBy")
+  visitorNotesCreated VisitorNote[] @relation("VisitorNoteCreatedBy")
+  visitorNotesUpdated VisitorNote[] @relation("VisitorNoteUpdatedBy")
+  approvedOrganizationRequests OrganizationRequest[] @relation("OrgRequestApprover")
+
+  @@index([email])
+  @@index([systemRole])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String   @db.VarChar(320)
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// =============================================================================
+// ORGANIZATION (tenant root)
+// =============================================================================
+
+enum OrgStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum MemberStatus {
+  ACTIVE
+  INVITED
+  DISABLED
+}
+
+model Organization {
+  id        String    @id @default(cuid())
+  name      String    @db.VarChar(255)
+  slug      String    @unique @db.VarChar(100)
+  logoUrl   String?
+  settings  Json      @default("{}")
+  /// Phase 7.1 — SaaS tenant lifecycle; `isActive` retained for backward compatibility.
+  status    OrgStatus @default(PENDING)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  members         OrganizationMember[]
+  invites         OrganizationInvite[]
+  roles           Role[]
+  rolePermissions RolePermission[]
+  branches        Branch[]
+  visitors        Visitor[]
+  visits          Visit[]
+  visitApprovals  VisitApproval[]
+  visitEvents     VisitEvent[]
+  auditLogs       AuditLog[]
+  subscription       Subscription?
+  usageRecords       UsageRecord[]
+  organizationSettings OrganizationSettings?
+  branchSettingsList   BranchSettings[]
+  featureFlags         FeatureFlag[]
+  notifications        AppNotification[]
+  emailDeliveryLogs    EmailDeliveryLog[]
+  emailFailureLogs     EmailFailureLog[]
+  notificationJobs     NotificationJob[]
+  notificationDlq      NotificationDlq[]
+  visitorNotes         VisitorNote[]
+  analyticsSnapshots   AnalyticsSnapshot[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([status])
+  @@index([deletedAt])
+  @@map("organizations")
+}
+
+// =============================================================================
+// ORGANIZATION ONBOARDING REQUESTS (platform-scoped)
+// =============================================================================
+
+enum OrgRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model OrganizationRequest {
+  id                    String           @id @default(cuid())
+  organizationName      String           @db.VarChar(255)
+  organizationEmail     String           @db.VarChar(320)
+  contactPerson         String           @db.VarChar(255)
+  contactEmail          String           @db.VarChar(320)
+  contactPhone          String?          @db.VarChar(50)
+  requestedPlan         String?          @db.VarChar(100)
+  status                OrgRequestStatus @default(PENDING)
+  rejectionReason       String?          @db.Text
+  approvalNotes         String?          @db.Text
+  approvedById          String?
+  approvedAt            DateTime?
+  createdOrganizationId String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  approvedBy User? @relation("OrgRequestApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([contactEmail])
+  @@index([organizationName])
+  @@map("organization_requests")
+}
+
+// =============================================================================
+// ORGANIZATION & BRANCH CONFIGURATION
+// =============================================================================
+
+model OrganizationSettings {
+  id             String @id @default(cuid())
+  organizationId String @unique
+
+  // Branding
+  logoUrl         String?
+  primaryColor    String   @default("#2563EB") @db.VarChar(20)
+  secondaryColor  String   @default("#1E40AF") @db.VarChar(20)
+  welcomeMessage  String?  @db.VarChar(500)
+  /// App shell theme preference: system | light | dark | custom
+  themeMode       String   @default("system") @db.VarChar(20)
+
+  // Visitor settings
+  requiresApproval Boolean @default(false)
+  allowWalkIns     Boolean @default(true)
+  capturePhoto     Boolean @default(false)
+  requireIDUpload  Boolean @default(false)
+
+  // Check-in settings
+  qrRequired              Boolean @default(true)
+  manualOverrideAllowed   Boolean @default(true)
+
+  // Notification settings
+  emailEnabled Boolean @default(true)
+  smsEnabled   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("organization_settings")
+}
+
+enum BadgeTemplateType {
+  standard
+  minimal
+  photo
+}
+
+model BranchSettings {
+  id             String @id @default(cuid())
+  branchId       String @unique
+  organizationId String
+
+  requiresApproval  Boolean           @default(false)
+  autoCheckoutHours Int?
+  qrExpiryMinutes Int               @default(1440)
+  badgeTemplate   BadgeTemplateType @default(standard)
+  allowWalkIns    Boolean           @default(true)
+  /// Branch-specific operational policy overrides (kiosk, hours, photo/doc requirements, etc.)
+  operationalSettings Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch       Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("branch_settings")
+}
+
+model FeatureFlag {
+  id             String   @id @default(cuid())
+  organizationId String
+  key            String   @db.VarChar(100)
+  value          Json
+  description    String?  @db.VarChar(500)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, key])
+  @@index([organizationId])
+  @@map("feature_flags")
+}
+
+// =============================================================================
+// USERS ↔ ORGANIZATION (membership)
+// =============================================================================
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  roleId         String
+  /// Phase 7.1 — canonical membership lifecycle; `isActive` retained for compatibility.
+  status         MemberStatus @default(ACTIVE)
+  isActive       Boolean      @default(true)
+  joinedAt       DateTime     @default(now())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deactivatedAt  DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+
+  hostedVisits Visit[]         @relation("VisitHost")
+  approvals    VisitApproval[]
+
+  @@unique([organizationId, userId])
+  @@index([organizationId, isActive])
+  @@index([organizationId, status])
+  @@index([userId])
+  @@index([roleId])
+  @@map("organization_members")
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model OrganizationInvite {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String       @db.VarChar(320)
+  roleId         String
+  /// SHA-256 hash of the raw token (raw token only appears in email links).
+  tokenHash      String       @unique
+  invitedById    String
+  status         InviteStatus @default(PENDING)
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  invitedBy    User         @relation("InviteSender", fields: [invitedById], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, email, status])
+  @@index([organizationId, status])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("organization_invites")
+}
+
+// =============================================================================
+// RBAC — roles are org-scoped; permissions are a global catalog
+// =============================================================================
+
+model Role {
+  id             String   @id @default(cuid())
+  /// Null = global system role template; set = org-scoped role (existing installs).
+  organizationId String?
+  name           String   @db.VarChar(100)
+  slug           String   @db.VarChar(50)
+  description    String?  @db.VarChar(500)
+  isSystem       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  permissions  RolePermission[]
+  members      OrganizationMember[]
+  invites      OrganizationInvite[]
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("roles")
+}
+
+/// Global permission catalog (seeded once). Not tenant-scoped.
+model Permission {
+  id          String   @id @default(cuid())
+  slug        String   @unique @db.VarChar(100)
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+/// Denormalized organizationId enables direct tenant-scoped queries and RLS.
+model RolePermission {
+  organizationId String
+  roleId         String
+  permissionId   String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission   @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([organizationId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// =============================================================================
+// BRANCHES / LOCATIONS
+// =============================================================================
+
+model Branch {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String  @db.VarChar(255)
+  slug           String  @db.VarChar(100)
+  code           String? @db.VarChar(20)
+  description    String? @db.VarChar(500)
+  address        String? @db.VarChar(500)
+  timezone       String  @default("UTC") @db.VarChar(64)
+  isActive       Boolean @default(true)
+
+  requiresApproval  Boolean  @default(false)
+  autoCheckoutHours Int?
+  qrSecret          String
+  qrRotatedAt       DateTime @default(now())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visits         Visit[]
+  branchSettings BranchSettings?
+
+  @@unique([organizationId, slug])
+  @@unique([organizationId, code])
+  @@index([organizationId, isActive])
+  @@map("branches")
+}
+
+// =============================================================================
+// VISITORS
+// =============================================================================
+
+model Visitor {
+  id             String   @id @default(cuid())
+  organizationId String
+  firstName      String   @db.VarChar(100)
+  lastName       String   @db.VarChar(100)
+  email          String?  @db.VarChar(320)
+  phone          String?  @db.VarChar(30)
+  company        String?  @db.VarChar(255)
+  photoUrl       String?
+  notes          String?  @db.Text
+  visitorTags    String[] @default([])
+  isActive       Boolean  @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visits       Visit[]
+  operationalNotes VisitorNote[]
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, lastName, firstName])
+  @@index([organizationId, email])
+  @@index([organizationId, isActive])
+  @@map("visitors")
+}
+
+model VisitorNote {
+  id             String   @id @default(cuid())
+  organizationId String
+  visitorId      String
+  note           String   @db.Text
+  createdById    String
+  updatedById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visitor      Visitor      @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("VisitorNoteCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  updatedBy    User         @relation("VisitorNoteUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, visitorId, createdAt])
+  @@index([visitorId])
+  @@map("visitor_notes")
+}
+
+// =============================================================================
+// VISITS
+// =============================================================================
+
+enum VisitStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  CHECKED_IN
+  CHECKED_OUT
+}
+
+model Visit {
+  id             String      @id @default(cuid())
+  organizationId String
+  branchId       String
+  visitorId      String
+  hostMemberId   String
+  status         VisitStatus @default(PENDING)
+
+  purpose      String?   @db.VarChar(500)
+  scheduledAt  DateTime?
+  checkedInAt    DateTime?
+  checkedOutAt   DateTime?
+  checkedInById  String?
+  checkedOutById String?
+  qrToken      String?   @unique
+  qrExpiresAt  DateTime?
+  badgeNumber  String?   @db.VarChar(50)
+  cancelledAt  DateTime?
+  cancelReason String?   @db.VarChar(500)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch             @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  visitor      Visitor            @relation(fields: [visitorId], references: [id], onDelete: Restrict)
+  host         OrganizationMember @relation("VisitHost", fields: [hostMemberId], references: [id], onDelete: Restrict)
+  checkedInBy  User?              @relation("VisitCheckedInBy", fields: [checkedInById], references: [id], onDelete: SetNull)
+  checkedOutBy User?              @relation("VisitCheckedOutBy", fields: [checkedOutById], references: [id], onDelete: SetNull)
+
+  approvals VisitApproval[]
+  events    VisitEvent[]
+
+  @@index([organizationId, status])
+  @@index([organizationId, scheduledAt])
+  @@index([organizationId, createdAt])
+  @@index([organizationId, branchId, status])
+  @@index([organizationId, hostMemberId])
+  @@index([organizationId, visitorId])
+  @@index([branchId])
+  @@index([visitorId])
+  @@index([hostMemberId])
+  @@map("visits")
+}
+
+// =============================================================================
+// APPROVALS
+// =============================================================================
+
+enum ApprovalDecision {
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model VisitApproval {
+  id               String            @id @default(cuid())
+  organizationId   String
+  visitId          String
+  approverMemberId String
+  status           ApprovalStatus    @default(PENDING)
+  decision         ApprovalDecision?
+  notes            String?           @db.Text
+  decidedAt        DateTime?
+  expiresAt        DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visit        Visit              @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  approver     OrganizationMember @relation(fields: [approverMemberId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, status])
+  @@index([organizationId, createdAt])
+  @@index([visitId])
+  @@index([approverMemberId, status])
+  @@map("visit_approvals")
+}
+
+// =============================================================================
+// IN-APP NOTIFICATIONS (lightweight — no email/SMS)
+// =============================================================================
+
+model AppNotification {
+  id             String    @id @default(cuid())
+  organizationId String
+  userId         String
+  type           String    @db.VarChar(100)
+  /// Denormalized category for filtering (arrivals | approvals | system).
+  category       String?   @db.VarChar(50)
+  title          String    @db.VarChar(255)
+  body           String    @db.Text
+  resourceType   String?   @db.VarChar(50)
+  resourceId       String?
+  readAt           DateTime?
+  /// Phase 6.9 — delivery tracking for queued notification engine.
+  deliveryStatus   String?   @db.VarChar(32)
+  channelUsed      String?   @db.VarChar(50)
+  providerResponse String?   @db.Text
+  retryCount       Int       @default(0)
+  deliveryKey      String?   @unique @db.VarChar(255)
+  createdAt        DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, userId, createdAt])
+  @@index([organizationId, userId, readAt])
+  @@index([organizationId, category])
+  @@map("app_notifications")
+}
+
+// =============================================================================
+// TRANSACTIONAL EMAIL DELIVERY (idempotency + dead-letter)
+// =============================================================================
+
+model EmailDeliveryLog {
+  id             String    @id @default(cuid())
+  organizationId String
+  idempotencyKey String    @unique @db.VarChar(255)
+  emailType      String    @db.VarChar(100)
+  visitId        String?
+  toEmail        String    @db.VarChar(320)
+  status         String    @db.VarChar(32)
+  retryCount     Int       @default(0)
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+  sentAt         DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, visitId])
+  @@index([organizationId, emailType, createdAt])
+  @@map("email_delivery_logs")
+}
+
+model EmailFailureLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  idempotencyKey String   @db.VarChar(255)
+  emailType      String   @db.VarChar(100)
+  toEmail        String   @db.VarChar(320)
+  payload        Json
+  error          String   @db.Text
+  retryCount     Int
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, createdAt])
+  @@index([idempotencyKey])
+  @@map("email_failure_logs")
+}
+
+// =============================================================================
+// NOTIFICATION ENGINE (Phase 6.9 — queue, retry, DLQ)
+// =============================================================================
+
+model NotificationJob {
+  id             String    @id @default(cuid())
+  organizationId String
+  eventType      String    @db.VarChar(100)
+  channelTypes   Json
+  recipients     Json
+  payload        Json
+  status         String    @db.VarChar(32)
+  retryCount     Int       @default(0)
+  maxRetries     Int       @default(5)
+  nextRetryAt    DateTime?
+  lastError      String?   @db.Text
+  idempotencyKey String    @unique @db.VarChar(255)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextRetryAt])
+  @@index([organizationId, createdAt])
+  @@map("notification_jobs")
+}
+
+model NotificationDlq {
+  id             String   @id @default(cuid())
+  jobId          String   @unique
+  organizationId String
+  eventType      String   @db.VarChar(100)
+  channelTypes   Json
+  recipients     Json
+  payload        Json
+  retryCount     Int
+  lastError      String   @db.Text
+  failedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, failedAt])
+  @@map("notification_dlq")
+}
+
+// =============================================================================
+// VISIT TIMELINE (history)
+// =============================================================================
+
+model VisitEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  visitId        String
+  type           String   @db.VarChar(100)
+  payload        Json     @default("{}")
+  actorId        String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visit        Visit        @relation(fields: [visitId], references: [id], onDelete: Cascade)
+  actor        User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([visitId, createdAt])
+  @@index([actorId])
+  @@map("visit_events")
+}
+
+// =============================================================================
+// AUDIT LOGS (append-only, tenant-scoped)
+// =============================================================================
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  actorId        String?
+  action         String   @db.VarChar(100)
+  resourceType   String   @db.VarChar(50)
+  resourceId     String
+  metadata       Json     @default("{}")
+  ipAddress      String?  @db.VarChar(45)
+  userAgent      String?  @db.VarChar(500)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  actor        User?        @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt])
+  @@index([organizationId, action])
+  @@index([organizationId, actorId])
+  @@index([organizationId, resourceType, resourceId])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}
+
+// =============================================================================
+// ANALYTICS SNAPSHOTS (precomputed read model — tenant-scoped)
+// =============================================================================
+
+enum AnalyticsSnapshotType {
+  dashboard
+  branch
+  host
+  audit
+}
+
+enum AnalyticsSnapshotPeriod {
+  daily
+  weekly
+  monthly
+}
+
+model AnalyticsSnapshot {
+  id             String                  @id @default(cuid())
+  organizationId String
+  type           AnalyticsSnapshotType
+  period         AnalyticsSnapshotPeriod
+  periodStart    DateTime
+  periodEnd      DateTime
+  data           Json
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, type, period, periodStart])
+  @@index([organizationId, type, period, periodStart])
+  @@map("analytics_snapshots")
+}
+
+// =============================================================================
+// BILLING (future — org-scoped, ready for Stripe integration)
+// =============================================================================
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String   @db.VarChar(100)
+  slug        String   @unique @db.VarChar(50)
+  description String?  @db.VarChar(500)
+  limits      Json     @default("{}")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String             @unique
+  planId               String
+  status               SubscriptionStatus @default(TRIALING)
+  currentPeriodStart   DateTime           @default(now())
+  currentPeriodEnd     DateTime
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  cancelledAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan          @relation(fields: [planId], references: [id], onDelete: Restrict)
+  usageRecords UsageRecord[]
+
+  @@index([status])
+  @@index([currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model UsageRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  subscriptionId String
+  metric         String   @db.VarChar(50)
+  quantity       Int
+  periodStart    DateTime
+  periodEnd      DateTime
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, metric, periodStart])
+  @@index([subscriptionId, metric, periodStart])
+  @@map("usage_records")
+}

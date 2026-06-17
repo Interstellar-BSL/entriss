@@ -1,26 +1,121 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f4f5;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --surface-muted: #f4f4f5;
+  --border: #e4e4e7;
+  --muted: #71717a;
+  --accent: #18181b;
+  --brand-primary: #18181b;
+  --brand-secondary: #27272a;
+  --brand-primary-hover: #27272a;
+  --on-brand: #ffffff;
+  --link: var(--brand-primary);
+  --ring: var(--brand-primary);
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+}
+
+[data-org-theme="dark"] {
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --surface-muted: #141416;
+  --border: #27272a;
+  --muted: #a1a1aa;
+  --accent: #fafafa;
+  --link: var(--brand-primary);
+  --ring: var(--brand-primary);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-org-theme="system"] {
+    --background: #09090b;
+    --foreground: #fafafa;
+    --card: #18181b;
+    --surface-muted: #141416;
+    --border: #27272a;
+    --muted: #a1a1aa;
+    --accent: #fafafa;
+    --link: var(--brand-primary);
+    --ring: var(--brand-primary);
+    color-scheme: dark;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-link: var(--link);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+a:not([class]) {
+  color: var(--link);
+}
+
+a:not([class]):hover {
+  color: var(--brand-primary-hover);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+[data-org-theme="dark"] body,
+[data-org-theme="system"] body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@media print {
+  aside,
+  header,
+  nav,
+  .no-print,
+  button,
+  [role="banner"],
+  [data-app-sidebar] {
+    display: none !important;
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    overflow: visible !important;
+  }
+
+  main,
+  [data-app-main] {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  #badge-print-root,
+  #badge-print-root * {
+    overflow: visible !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+@keyframes global-loading-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
 }

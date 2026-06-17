@@ -1,0 +1,56 @@
+"use client";
+
+import { useState } from "react";
+
+import { cn } from "@/lib/utils/cn";
+
+export function BrandMark({
+  logoUrl,
+  initial,
+  primaryColor,
+  alt,
+  boxClassName,
+  initialClassName,
+  imageClassName,
+}: {
+  logoUrl?: string | null;
+  initial: string;
+  primaryColor: string;
+  alt: string;
+  boxClassName: string;
+  initialClassName?: string;
+  imageClassName?: string;
+}) {
+  const [failed, setFailed] = useState(false);
+  const showImage = Boolean(logoUrl?.trim()) && !failed;
+
+  return (
+    <div
+      className={cn(
+        "relative shrink-0 overflow-hidden bg-[var(--surface-muted)]",
+        boxClassName,
+      )}
+      aria-hidden={!alt}
+    >
+      {showImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoUrl!}
+          alt={alt}
+          className={cn("h-full w-full object-cover object-center", imageClassName)}
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        <div
+          className={cn(
+            "flex h-full w-full items-center justify-center font-bold text-[var(--on-brand)]",
+            initialClassName,
+          )}
+          style={{ backgroundColor: primaryColor }}
+        >
+          {initial}
+        </div>
+      )}
+    </div>
+  );
+}
