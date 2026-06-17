@@ -1,5 +1,5 @@
-import type { Visitor } from "@/app/generated/prisma/client";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { Visitor } from "@prisma/client";
+import type { VisitStatus } from "@prisma/client";
 
 export class ServiceError extends Error {
   readonly code: string;

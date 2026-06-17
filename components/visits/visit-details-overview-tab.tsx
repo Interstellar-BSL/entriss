@@ -8,7 +8,7 @@ import {
   SectionCard,
   SummaryStatusCard,
 } from "@/components/visits/visit-details-shared";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import {
   canCheckInVisit,
   canCheckOutVisit,

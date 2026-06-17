@@ -1,5 +1,5 @@
-import type { Visit } from "@/app/generated/prisma/client";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import type { Visit } from "@prisma/client";
+import { VisitStatus } from "@prisma/client";
 import {
   invalidateAnalyticsOnApprovalUpdate,
   invalidateAnalyticsOnCheckInOut,

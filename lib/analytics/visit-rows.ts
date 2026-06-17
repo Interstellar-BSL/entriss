@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { resolveHostDisplayName } from "@/lib/hosts/display";
 import { prisma } from "@/lib/db/client";
 import { calculateStatusBreakdown } from "@/lib/analytics/query/kpi-calculators";

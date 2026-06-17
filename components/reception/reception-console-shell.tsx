@@ -26,7 +26,7 @@ import { QrCodeModal } from "@/components/visits/qr-code-modal";
 import { VisitDetailsDrawer } from "@/components/visits/visit-details-drawer";
 import { Button } from "@/components/ui/button";
 import { KIOSK_ERROR_AUTO_RETURN_MS } from "@/components/kiosk/kiosk-ui";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import type { VisitorRecord } from "@/lib/api/visitors";
 import {
   cancelVisit,

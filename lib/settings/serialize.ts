@@ -1,4 +1,4 @@
-import type { OrganizationSettings } from "@/app/generated/prisma/client";
+import type { OrganizationSettings } from "@prisma/client";
 
 import {
   normalizeApprovalSettings,

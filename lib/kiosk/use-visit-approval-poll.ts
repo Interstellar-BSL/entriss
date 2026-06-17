@@ -9,7 +9,7 @@ import {
   isVisitPendingApproval,
 } from "@/lib/visits/workflow-engine";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 
 const DEFAULT_POLL_MS = 4_000;
 const WARN_AFTER_FAILURES = 3;

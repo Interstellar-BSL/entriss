@@ -5,7 +5,7 @@ import type {
   ResolvedBranchConfig,
   ResolvedOrganizationConfig,
 } from "@/lib/settings/types";
-import type { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import type { BadgeTemplateType } from "@prisma/client";
 
 import type {
   BranchSettingsResponse,

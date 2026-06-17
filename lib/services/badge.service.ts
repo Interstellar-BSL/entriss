@@ -1,4 +1,4 @@
-import { BadgeTemplateType, VisitStatus } from "@/app/generated/prisma/enums";
+import { BadgeTemplateType, VisitStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { resolveBranchConfig } from "@/lib/settings/resolver";
 import type { BadgePrinterLayout, BadgePrintData } from "@/lib/devices/badge-printer.interface";

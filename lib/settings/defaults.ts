@@ -1,4 +1,4 @@
-import { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import { BadgeTemplateType } from "@prisma/client";
 
 export { DEFAULT_BRANCH_OPERATIONAL_SETTINGS } from "./branch-operational";
 

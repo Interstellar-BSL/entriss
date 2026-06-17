@@ -1,4 +1,4 @@
-import type { Visitor } from "@/app/generated/prisma/client";
+import type { Visitor } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
 import { requirePermission } from "@/lib/tenant/tenant-context";

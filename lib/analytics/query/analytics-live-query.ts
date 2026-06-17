@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { resolveAnalyticsDateRange } from "@/lib/analytics/date-ranges";
 import { prisma } from "@/lib/db/client";
 import { getActivityStream } from "@/lib/services/activity-stream.service";

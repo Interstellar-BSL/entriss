@@ -1,4 +1,4 @@
-import type { SystemRole } from "@/app/generated/prisma/enums";
+import type { SystemRole } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import type { ActiveOrganization } from "@/lib/tenant/resolve-organization";
 import type { TenantContext } from "@/lib/tenant/tenant-context";

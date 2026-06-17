@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api/client";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { VisitStatus } from "@prisma/client";
 import type { VisitorType } from "@/lib/api/visitors";
 import type { VisitorTag } from "@/lib/visitors/tags";
 

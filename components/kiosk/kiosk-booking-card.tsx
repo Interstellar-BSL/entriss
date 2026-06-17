@@ -2,7 +2,7 @@ import { Building2, Calendar, User } from "lucide-react";
 
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 import { kioskHostLabel } from "@/lib/kiosk/visit-display";
 import { cn } from "@/lib/utils/cn";

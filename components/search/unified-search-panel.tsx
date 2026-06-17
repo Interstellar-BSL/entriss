@@ -29,7 +29,7 @@ import {
   type UnifiedSearchVisitorResult,
 } from "@/lib/api/search";
 import { listVisits } from "@/lib/api/visits";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 import { resolveHostDisplayName } from "@/lib/hosts/display";
 import { cn } from "@/lib/utils/cn";

@@ -1,5 +1,5 @@
-import type { PrismaClient } from "@/app/generated/prisma/client";
-import { SystemRole } from "@/app/generated/prisma/enums";
+import type { PrismaClient } from "@prisma/client";
+import { SystemRole } from "@prisma/client";
 import { hash } from "bcryptjs";
 
 export const SUPER_ADMIN_EMAIL = "superadmin@entriss.local";

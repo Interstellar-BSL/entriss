@@ -7,7 +7,7 @@ import { QrCodeModal } from "@/components/visits/qr-code-modal";
 import { StatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import type { RegisterVisitResponse } from "@/lib/visits/types";
 import { kioskHostLabel } from "@/lib/kiosk/visit-display";
 

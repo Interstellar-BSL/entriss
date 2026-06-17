@@ -1,4 +1,4 @@
-import { InviteStatus } from "@/app/generated/prisma/enums";
+import { InviteStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import type { DbExecutor } from "@/lib/db/transaction";
 import { isPrismaKnownRequestError } from "@/lib/db/prisma-errors";

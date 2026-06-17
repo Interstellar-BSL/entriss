@@ -1,5 +1,5 @@
-import type { Prisma } from "@/app/generated/prisma/client";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { Prisma } from "@prisma/client";
+import type { VisitStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 
 export async function recordVisitEvent(

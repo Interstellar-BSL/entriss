@@ -1,4 +1,4 @@
-import type { SystemRole } from "@/app/generated/prisma/enums";
+import type { SystemRole } from "@prisma/client";
 
 /** Header names injected by middleware — never trust values from the client. */
 export const REQUEST_CONTEXT_HEADERS = {

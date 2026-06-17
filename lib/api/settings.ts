@@ -16,7 +16,7 @@ import type {
   UpdateBranchSettingsInput,
   UpdateOrganizationSettingsInput,
 } from "@/lib/validations/settings";
-import type { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import type { BadgeTemplateType } from "@prisma/client";
 
 export type { NormalizedApprovalSettings };
 

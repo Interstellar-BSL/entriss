@@ -1,6 +1,6 @@
 import "server-only";
 
-import { MemberStatus } from "@/app/generated/prisma/enums";
+import { MemberStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { enforcePermission } from "@/lib/rbac/enforce";
 import { PERMISSIONS } from "@/lib/rbac/permissions";

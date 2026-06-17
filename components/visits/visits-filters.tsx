@@ -1,6 +1,6 @@
 "use client";
 
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils/cn";
 import type { BranchOption } from "@/lib/visits/types";

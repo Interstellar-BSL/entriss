@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@/app/generated/prisma/client";
+import type { PrismaClient } from "@prisma/client";
 import { createOrganizationDefaults, SYSTEM_ROLE_SLUGS } from "./roles";
 
 export const DEMO_ORGANIZATION_SLUG = "demo";

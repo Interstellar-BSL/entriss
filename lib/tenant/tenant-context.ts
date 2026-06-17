@@ -1,4 +1,4 @@
-import type { SystemRole } from "@/app/generated/prisma/enums";
+import type { SystemRole } from "@prisma/client";
 import type { ActiveOrganization } from "./resolve-organization";
 
 export interface TenantContext {
@@ -62,7 +62,7 @@ export function assertOrganizationAccess(
 export function buildTenantContext(input: {
   userId: string;
   email: string;
-  systemRole: import("@/app/generated/prisma/enums").SystemRole | null;
+  systemRole: import("@prisma/client").SystemRole | null;
   organizationId: string;
   organization: ActiveOrganization;
   role: string | null;

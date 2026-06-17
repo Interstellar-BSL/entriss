@@ -1,7 +1,7 @@
 import { queryAnalytics } from "@/lib/analytics/query/analytics-query.service";
 import type { AnalyticsPeriod } from "@/lib/analytics/date-ranges";
 import type { TenantContext } from "@/lib/tenant/tenant-context";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { VisitStatus } from "@prisma/client";
 
 import type { getActivityStream } from "./activity-stream.service";
 

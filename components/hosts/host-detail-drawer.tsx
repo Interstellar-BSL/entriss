@@ -18,7 +18,7 @@ import type { HostRow } from "@/components/hosts/hosts-page";
 
 import { formatHostDepartment } from "@/lib/hosts/host-department-store";
 
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 

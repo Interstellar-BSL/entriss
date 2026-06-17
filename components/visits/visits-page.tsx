@@ -30,7 +30,7 @@ import { detachVisitWithRelations } from "@/lib/visits/detach";
 import { searchVisitsByVisitor } from "@/lib/visits/search-visits";
 import type { BranchOption, ThermalBadgeData } from "@/lib/visits/types";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { VisitStatus } from "@prisma/client";
 
 const PAGE_SIZE = 25;
 const SEARCH_DEBOUNCE_MS = 300;

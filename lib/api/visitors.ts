@@ -4,7 +4,7 @@ import type {
   CreateVisitorRequestInput,
   ResolveVisitorIdentityInput,
 } from "@/lib/validations/visitor";
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { VisitStatus } from "@prisma/client";
 import type { VisitorTag } from "@/lib/visitors/tags";
 
 export interface VisitorRecord {

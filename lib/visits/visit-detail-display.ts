@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 
 import { normalizeVisitorApprovalFields } from "@/lib/settings/approval-normalize";
 import type { VisitApprovalRecord, VisitEventRecord } from "@/lib/services/internal/visit-include";

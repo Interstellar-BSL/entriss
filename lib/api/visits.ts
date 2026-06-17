@@ -1,4 +1,4 @@
-import type { VisitStatus } from "@/app/generated/prisma/enums";
+import type { VisitStatus } from "@prisma/client";
 import { apiFetch, type PaginatedResult } from "@/lib/api/client";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 import {

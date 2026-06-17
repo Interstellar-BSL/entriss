@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { z } from "zod";
 
 import { paginationQuerySchema } from "@/lib/api/pagination";

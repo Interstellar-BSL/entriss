@@ -1,4 +1,4 @@
-import type { OrgStatus, SystemRole } from "@/app/generated/prisma/enums";
+import type { OrgStatus, SystemRole } from "@prisma/client";
 
 import {
   isPlatformAdmin,

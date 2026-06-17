@@ -1,66 +1,22 @@
-import { statSync } from "node:fs";
-import { join } from "node:path";
-
-import { PrismaClient } from "@/app/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-
-const GENERATED_CLIENT_PATH = join(
-  process.cwd(),
-  "app/generated/prisma/client.ts",
-);
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-  prismaClientMtime: number | undefined;
+  prisma?: PrismaClient;
 };
-
-function getGeneratedClientMtime(): number {
-  if (process.env.NODE_ENV === "production") {
-    return 0;
-  }
-
-  try {
-    return statSync(GENERATED_CLIENT_PATH).mtimeMs;
-  } catch {
-    return 0;
-  }
-}
 
 function createPrismaClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
-    throw new Error("DATABASE_URL environment variable is not set");
+    throw new Error("DATABASE_URL is not set");
   }
 
-  const pool = new Pool({ connectionString });
-  const adapter = new PrismaPg(pool);
-
+  const adapter = new PrismaPg({ connectionString });
   return new PrismaClient({ adapter });
 }
 
-function getPrismaClient(): PrismaClient {
-  const generatedMtime = getGeneratedClientMtime();
-  const cached = globalForPrisma.prisma;
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-  if (
-    cached &&
-    (process.env.NODE_ENV === "production" ||
-      globalForPrisma.prismaClientMtime === generatedMtime)
-  ) {
-    return cached;
-  }
-
-  const client = createPrismaClient();
-
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.prisma = client;
-    globalForPrisma.prismaClientMtime = generatedMtime;
-  }
-
-  return client;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
-
-export const prisma = getPrismaClient();
-
-export type DbClient = typeof prisma;

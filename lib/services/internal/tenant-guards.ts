@@ -1,4 +1,4 @@
-import { MemberStatus } from "@/app/generated/prisma/enums";
+import { MemberStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import type { TenantContext } from "@/lib/tenant/tenant-context";
 

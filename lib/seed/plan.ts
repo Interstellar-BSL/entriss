@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@/app/generated/prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 export const DEFAULT_PLAN_SLUG = "trial";
 

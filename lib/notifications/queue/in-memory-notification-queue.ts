@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db/client";
-import type { Prisma } from "@/app/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { isPrismaKnownRequestError } from "@/lib/db/prisma-errors";
 
 import { processNotificationJob } from "../worker/notification.worker";

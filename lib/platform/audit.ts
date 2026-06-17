@@ -1,4 +1,4 @@
-import type { Prisma } from "@/app/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { writeAuditLog } from "@/lib/audit/logger";
 import { DEFAULT_ORGANIZATION_ID } from "@/lib/tenant/constants";
 

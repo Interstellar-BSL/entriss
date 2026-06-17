@@ -1,4 +1,4 @@
-import type { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import type { BadgeTemplateType } from "@prisma/client";
 
 import type { BranchOperationalSettings } from "./branch-operational";
 import type { FeatureFlagKey } from "./feature-flags";

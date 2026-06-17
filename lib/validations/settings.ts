@@ -1,4 +1,4 @@
-import { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import { BadgeTemplateType } from "@prisma/client";
 import { z } from "zod";
 
 import { FEATURE_FLAGS } from "@/lib/settings/feature-flags";

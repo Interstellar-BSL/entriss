@@ -1,4 +1,4 @@
-import { ApprovalStatus, VisitStatus } from "@/app/generated/prisma/enums";
+import { ApprovalStatus, VisitStatus } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
 import { requirePermission } from "@/lib/tenant/tenant-context";

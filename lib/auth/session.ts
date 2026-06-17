@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 
-import type { OrgStatus } from "@/app/generated/prisma/enums";
+import type { OrgStatus } from "@prisma/client";
 import { validateTenantSession } from "@/lib/auth/validate-tenant-session";
 import {
   getInjectedTenantContext,

@@ -1,9 +1,9 @@
-import type { Visit } from "@/app/generated/prisma/client";
+import type { Visit } from "@prisma/client";
 import {
   ApprovalDecision,
   ApprovalStatus,
   VisitStatus,
-} from "@/app/generated/prisma/enums";
+} from "@prisma/client";
 import { writeAuditLog } from "@/lib/audit/logger";
 import { invalidateAnalyticsOnApprovalUpdate } from "@/lib/analytics/cache/cache-invalidation";
 import { prisma } from "@/lib/db/client";

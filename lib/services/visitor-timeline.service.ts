@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { isNoShowVisit } from "@/lib/visits/no-show";
 import { prisma } from "@/lib/db/client";
 import { PERMISSIONS } from "@/lib/rbac/permissions";

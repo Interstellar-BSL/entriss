@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { PolicyError } from "@/lib/server/errors/policy.errors";
 import type { VisitStateSource } from "@/lib/server/visits/visit-states";
 import type { BranchOperationalSettings } from "@/lib/settings/branch-operational";

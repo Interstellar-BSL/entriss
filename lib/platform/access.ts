@@ -1,4 +1,4 @@
-import type { SystemRole } from "@/app/generated/prisma/enums";
+import type { SystemRole } from "@prisma/client";
 
 export function isPlatformAdmin(
   systemRole: SystemRole | null | undefined,

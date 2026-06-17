@@ -1,4 +1,4 @@
-import type { Visitor, Visit } from "@/app/generated/prisma/client";
+import type { Visitor, Visit } from "@prisma/client";
 import type { TenantContext } from "@/lib/tenant/tenant-context";
 import {
   createVisitorForStaff,

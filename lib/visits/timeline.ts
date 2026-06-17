@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 
 import type { VisitDetail, VisitTimelineEntry } from "./types";
 

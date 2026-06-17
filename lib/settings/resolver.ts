@@ -1,4 +1,4 @@
-import type { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import type { BadgeTemplateType } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { isPrismaKnownRequestError } from "@/lib/db/prisma-errors";
 import type { TenantContext } from "@/lib/tenant/tenant-context";

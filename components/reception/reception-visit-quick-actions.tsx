@@ -12,7 +12,7 @@ import {
 
 import { receptionCompactButton } from "@/components/reception/reception-ui";
 import { Button } from "@/components/ui/button";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import {
   canCheckInVisit,
   canCheckOutVisit,

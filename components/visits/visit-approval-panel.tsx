@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { VisitTimeline } from "@/components/visits/visit-timeline";
 import { DetailRow } from "@/components/visits/visit-details-shared";
 import { Button } from "@/components/ui/button";

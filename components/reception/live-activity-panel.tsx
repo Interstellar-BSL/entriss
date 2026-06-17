@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api/client";
 import { listVisits } from "@/lib/api/visits";
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import {
   fetchLiveActivityFeed,
   LIVE_ACTIVITY_REFRESH_MS,

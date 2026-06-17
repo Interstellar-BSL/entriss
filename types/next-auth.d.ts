@@ -1,4 +1,4 @@
-import type { OrgStatus } from "@/app/generated/prisma/enums";
+import type { OrgStatus } from "@prisma/client";
 
 import "next-auth";
 import "next-auth/jwt";
@@ -34,7 +34,7 @@ declare module "next-auth/jwt" {
     userId: string;
     email: string;
     name?: string | null;
-    systemRole?: import("@/app/generated/prisma/enums").SystemRole | null;
+    systemRole?: import("@prisma/client").SystemRole | null;
     organizationId: string | null;
     role: string | null;
     organizationStatus: OrgStatus | null;

@@ -1,4 +1,4 @@
-import { VisitStatus } from "@/app/generated/prisma/enums";
+import { VisitStatus } from "@prisma/client";
 import { invalidateAnalyticsOnOverride } from "@/lib/analytics/cache/cache-invalidation";
 import { emitNotification, projectVisitStatusNotification } from "@/lib/notifications/projector";
 import { triggerSnapshotRebuild } from "@/lib/analytics/snapshots/snapshot-rebuild";

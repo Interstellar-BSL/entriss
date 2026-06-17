@@ -1,4 +1,4 @@
-import type { Prisma } from "@/app/generated/prisma/client";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
 import { enforceUserManagement } from "@/lib/rbac/enforce";

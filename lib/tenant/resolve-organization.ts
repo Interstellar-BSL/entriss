@@ -1,4 +1,4 @@
-import type { MemberStatus, OrgStatus, SystemRole } from "@/app/generated/prisma/enums";
+import type { MemberStatus, OrgStatus, SystemRole } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { ALL_PERMISSIONS } from "@/lib/rbac/permissions";
 import { DEFAULT_ORGANIZATION_ID } from "@/lib/tenant/constants";

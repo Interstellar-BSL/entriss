@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormField } from "@/components/forms/form-field";
 import { Input } from "@/components/ui/input";
-import { BadgeTemplateType } from "@/app/generated/prisma/enums";
+import { BadgeTemplateType } from "@prisma/client";
 import { ApiError } from "@/lib/api/client";
 import {
   getBranchSettings,

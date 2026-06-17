@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import type { Prisma as PrismaTypes } from "@/app/generated/prisma/client";
+import type { Prisma as PrismaTypes } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import { isPrismaKnownRequestError } from "@/lib/db/prisma-errors";
 import { PERMISSIONS } from "@/lib/rbac/permissions";

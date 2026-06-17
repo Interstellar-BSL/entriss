@@ -3,7 +3,7 @@ import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { z } from "zod";
 
-import type { OrgStatus, SystemRole } from "@/app/generated/prisma/enums";
+import type { OrgStatus, SystemRole } from "@prisma/client";
 import { prisma } from "@/lib/db/client";
 import {
   isOrganizationApproved,
