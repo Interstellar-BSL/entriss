@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { PanelSkeleton } from "@/components/shared/loading-state";
 import {
   AnalyticsFilters,
   DEFAULT_ANALYTICS_FILTERS,
@@ -76,7 +77,7 @@ export function HostAnalyticsPanel({
       ) : null}
 
       {loading && !data ? (
-        <div className="h-40 animate-pulse rounded-md bg-[var(--surface-muted)]" />
+        <PanelSkeleton />
       ) : data ? (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <Card>

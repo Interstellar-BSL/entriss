@@ -17,7 +17,7 @@ import {
 import { ServiceError, VisitNotFoundError } from "./errors";
 import { visitInclude } from "./internal/visit-include";
 import { emitNotification } from "@/lib/notifications/projector";
-import { ensureVisitQR } from "./qr.service";
+import { sendVisitInvitation } from "@/lib/notifications/visit-invitation";
 import { getVisitById } from "./visit.service";
 import { assertVisitTransition } from "./visit-transitions";
 
@@ -224,7 +224,6 @@ export async function approveVisit(
   });
 
   await finalizeVisitApproval(ctx, visitId, ApprovalDecision.APPROVED, notes);
-  await ensureVisitQR(ctx, visitId);
 
   await writeAuditLog({
     organizationId: ctx.organizationId,
@@ -235,13 +234,7 @@ export async function approveVisit(
     metadata: { notes: notes ?? null, targetStatus },
   });
 
-  emitNotification(ctx, {
-    kind: "VISIT_APPROVED",
-    visitId,
-    visitorId: visit.visitorId,
-    visitorName: `${visit.visitor.firstName} ${visit.visitor.lastName}`.trim(),
-    actorId: ctx.userId,
-  });
+  await sendVisitInvitation(ctx, visitId);
 
   invalidateAnalyticsOnApprovalUpdate(ctx.organizationId);
 

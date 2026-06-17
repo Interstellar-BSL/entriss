@@ -12,6 +12,7 @@ export {
   projectVisitStatusNotification,
   projectApprovalReminderNotifications,
 } from "./projector";
+export { sendVisitInvitation } from "./visit-invitation";
 export { emitPlatformNotification } from "./platform-projector";
 export { mapEventToNotifications, mapPlatformEventToNotifications } from "./event-mapper";
 export {

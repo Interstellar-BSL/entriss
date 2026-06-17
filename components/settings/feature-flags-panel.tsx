@@ -94,7 +94,7 @@ export function FeatureFlagsPanel() {
   }
 
   if (loading) {
-    return <LoadingState label="Loading feature flags…" />;
+    return <LoadingState variant="panel" />;
   }
 
   if (error && flags.length === 0) {

@@ -64,6 +64,7 @@ export function LoginForm() {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="you@company.com"
+          className="transition-shadow duration-200"
         />
       </div>
 
@@ -80,6 +81,7 @@ export function LoginForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="Enter your password"
+          className="transition-shadow duration-200"
         />
       </div>
 

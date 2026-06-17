@@ -51,7 +51,7 @@ export function PageContainer({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn("mx-auto w-full max-w-7xl px-4 py-6 lg:px-8", className)}>
+    <div className={cn("mx-auto w-full max-w-7xl px-4 py-6 lg:px-8 motion-safe:animate-alive-fade-in", className)}>
       {children}
     </div>
   );

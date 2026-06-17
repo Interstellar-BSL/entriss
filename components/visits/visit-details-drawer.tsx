@@ -304,7 +304,7 @@ export function VisitDetailsDrawer({
       header={visit ? <VisitDetailsHeader visit={visit} /> : undefined}
       title="Visit details"
     >
-      {loading ? <LoadingState label="Loading visit…" /> : null}
+      {loading ? <LoadingState variant="panel" /> : null}
 
       {!loading && error ? (
         <ErrorState

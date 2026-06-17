@@ -20,20 +20,44 @@ function formatWhen(iso?: string) {
   });
 }
 
+function formatVisitDate(iso?: string) {
+  if (!iso) {
+    return "Not scheduled";
+  }
+
+  return new Date(iso).toLocaleDateString(undefined, {
+    dateStyle: "full",
+  });
+}
+
+function formatVisitTime(iso?: string) {
+  if (!iso) {
+    return "Not scheduled";
+  }
+
+  return new Date(iso).toLocaleTimeString(undefined, {
+    timeStyle: "short",
+  });
+}
+
 const templates: Record<TransactionalEmailType, EmailTemplateDefinition> = {
   VISITOR_APPROVED: {
-    subject: () => "Your visit has been approved",
-    headline: (p) => `Hi ${p.visitor.name}, your visit is approved`,
-    intro: () =>
-      "Your visit request has been approved. Please present the QR code below at reception for check-in.",
+    subject: (p) => `Your visit invitation — ${p.organizationName ?? "Entriss"}`,
+    headline: (p) => `Hi ${p.visitor.name}, you're invited`,
+    intro: (p) =>
+      `Your visit to ${p.organizationName ?? "our location"} is confirmed. Present the QR code below at reception when you arrive.`,
     bullets: (p) => [
+      p.visit.purpose ? `Purpose: ${p.visit.purpose}` : "",
       `Host: ${p.host?.name ?? "Your host"}`,
+      `Organization: ${p.organizationName ?? "Entriss"}`,
       `Location: ${p.branch?.name ?? "Main office"}`,
       p.branch?.address ? `Address: ${p.branch.address}` : "",
-      `Scheduled: ${formatWhen(p.visit.scheduledAt)}`,
-      `Visit ID: ${p.visit.id}`,
+      `Date: ${formatVisitDate(p.visit.scheduledAt)}`,
+      `Time: ${formatVisitTime(p.visit.scheduledAt)}`,
+      `Visit reference: ${p.visit.visitReference ?? p.visit.id}`,
     ].filter(Boolean),
-    footer: () => "Arrive a few minutes early and have your ID ready if required.",
+    footer: () =>
+      "Arrive a few minutes early. Have your ID ready if required, and show this QR code at reception for a fast check-in.",
     includeQr: true,
   },
   VISITOR_CHECKED_IN: {

@@ -7,6 +7,7 @@ import {
 } from "@/lib/analytics/cache/cache-invalidation";
 import { triggerSnapshotRebuild } from "@/lib/analytics/snapshots/snapshot-rebuild";
 import { projectVisitStatusNotification } from "@/lib/notifications/projector";
+import { sendVisitInvitation } from "@/lib/notifications/visit-invitation";
 import { writeAuditLog } from "@/lib/audit/logger";
 import { buildPaginatedResult } from "@/lib/api/pagination";
 import { prisma } from "@/lib/db/client";
@@ -183,7 +184,7 @@ export async function createVisit(
   );
 
   if (initialStatus === VisitStatus.APPROVED) {
-    await ensureVisitQR(ctx, visit.id);
+    await sendVisitInvitation(ctx, visit.id);
   }
 
   invalidateAnalyticsOnVisitChange(ctx.organizationId);
@@ -318,6 +319,15 @@ export async function updateVisitStatus(
   }).catch((error) => {
     console.error("[notifications] visit status projection failed", error);
   });
+
+  if (
+    data.status === VisitStatus.APPROVED &&
+    existing.status !== VisitStatus.APPROVED
+  ) {
+    void sendVisitInvitation(ctx, visit.id).catch((error) => {
+      console.error("[notifications] visit invitation failed", error);
+    });
+  }
 
   return visit;
 }

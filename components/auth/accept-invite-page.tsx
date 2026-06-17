@@ -5,9 +5,10 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 
+import { AuthGlassCard, AuthPageHeader } from "@/components/auth/auth-shell";
+import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { acceptInvite, getInviteByToken, type InvitePreview } from "@/lib/api/invites";
 
 function AcceptInviteContent() {
@@ -77,34 +78,25 @@ function AcceptInviteContent() {
   }
 
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-[var(--muted)]">
-          Validating invitation…
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState label="Validating invitation…" />;
   }
 
   if (!invite) {
     return (
-      <Card>
-        <CardContent className="space-y-4 py-8 text-center">
-          <h1 className="text-lg font-semibold text-[var(--foreground)]">Invitation unavailable</h1>
-          <p className="text-sm text-[var(--muted)]">
-            {error ?? "This link may be expired, revoked, or already used."}
-          </p>
-          <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
-            Sign in
-          </Link>
-        </CardContent>
-      </Card>
+      <AuthGlassCard className="space-y-4 text-center">
+        <h1 className="text-lg font-semibold text-[var(--foreground)]">Invitation unavailable</h1>
+        <p className="text-sm text-[var(--muted)]">
+          {error ?? "This link may be expired, revoked, or already used."}
+        </p>
+        <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
+          Sign in
+        </Link>
+      </AuthGlassCard>
     );
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-5 py-8">
+    <AuthGlassCard className="space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-semibold text-[var(--foreground)]">
             Join {invite.organization.name}
@@ -146,8 +138,8 @@ function AcceptInviteContent() {
               disabled={submitting}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Joining…" : `Join ${invite.organization.name}`}
+          <Button type="submit" className="w-full" loading={submitting} disabled={submitting}>
+            {submitting ? "Joining organization…" : `Join ${invite.organization.name}`}
           </Button>
         </form>
 
@@ -162,19 +154,20 @@ function AcceptInviteContent() {
             Sign in to accept
           </Link>
         </p>
-      </CardContent>
-    </Card>
+    </AuthGlassCard>
   );
 }
 
 export function AcceptInvitePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-muted)] px-4">
-      <div className="w-full max-w-md">
-        <Suspense fallback={<p className="text-sm text-[var(--muted)]">Loading…</p>}>
-          <AcceptInviteContent />
-        </Suspense>
-      </div>
+    <div className="mx-auto w-full max-w-md">
+      <AuthPageHeader
+        title="Accept invitation"
+        subtitle="Join your organization on Entriss"
+      />
+      <Suspense fallback={<LoadingState label="Loading invitation…" />}>
+        <AcceptInviteContent />
+      </Suspense>
     </div>
   );
 }

@@ -175,7 +175,7 @@ export function OrgSettingsForm({ canEdit }: OrgSettingsFormProps) {
   }
 
   if (loading) {
-    return <LoadingState label="Loading organization settings…" />;
+    return <LoadingState variant="panel" />;
   }
 
   if (error && !data) {
@@ -306,8 +306,8 @@ export function OrgSettingsForm({ canEdit }: OrgSettingsFormProps) {
 
       {canEdit ? (
         <div className="flex justify-end">
-          <Button type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save organization settings"}
+          <Button type="submit" loading={saving} disabled={saving}>
+            {saving ? "Saving changes…" : "Save organization settings"}
           </Button>
         </div>
       ) : null}

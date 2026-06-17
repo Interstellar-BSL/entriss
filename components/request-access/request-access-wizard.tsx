@@ -6,7 +6,6 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { submitOrganizationRequest } from "@/lib/api/admin";
 import { cn } from "@/lib/utils/cn";
 
@@ -100,15 +99,7 @@ export function RequestAccessWizard() {
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-6 py-8">
-        <div className="text-center">
-          <h1 className="text-lg font-semibold text-[var(--foreground)]">Request organization access</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Get your company onboarded in a few quick steps
-          </p>
-        </div>
-
+    <div className="space-y-6 p-6">
         <StepIndicator current={step} />
 
         {step === 1 ? (
@@ -258,10 +249,11 @@ export function RequestAccessWizard() {
             <Button
               type="button"
               className="flex-1"
+              loading={submitting}
               disabled={submitting}
               onClick={() => void handleSubmit()}
             >
-              {submitting ? "Submitting…" : "Submit request"}
+              {submitting ? "Submitting request…" : "Submit request"}
             </Button>
           )}
         </div>
@@ -272,8 +264,7 @@ export function RequestAccessWizard() {
             Sign in
           </Link>
         </p>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 

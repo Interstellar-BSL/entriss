@@ -5,8 +5,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { AuthGlassCard } from "@/components/auth/auth-shell";
+import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   acceptInviteByPath,
   getInviteByToken,
@@ -56,26 +57,18 @@ export function InviteAcceptCard({ token }: { token: string }) {
   }
 
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-[var(--muted)]">
-          Loading invitation…
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState label="Loading invitation…" />;
   }
 
   if (!invite) {
     return (
-      <Card>
-        <CardContent className="space-y-4 py-8 text-center">
-          <h1 className="text-lg font-semibold text-[var(--foreground)]">Invalid invitation</h1>
-          <p className="text-sm text-[var(--muted)]">{error ?? "This link may be expired."}</p>
-          <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
-            Sign in
-          </Link>
-        </CardContent>
-      </Card>
+      <AuthGlassCard className="space-y-4 text-center">
+        <h1 className="text-lg font-semibold text-[var(--foreground)]">Invalid invitation</h1>
+        <p className="text-sm text-[var(--muted)]">{error ?? "This link may be expired."}</p>
+        <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
+          Sign in
+        </Link>
+      </AuthGlassCard>
     );
   }
 
@@ -83,8 +76,7 @@ export function InviteAcceptCard({ token }: { token: string }) {
     session?.user?.email?.toLowerCase() === invite.email.toLowerCase();
 
   return (
-    <Card>
-      <CardContent className="space-y-5 py-8">
+    <AuthGlassCard className="space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-semibold text-[var(--foreground)]">Join {invite.organization.name}</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
@@ -107,15 +99,15 @@ export function InviteAcceptCard({ token }: { token: string }) {
         ) : (
           <Button
             className="w-full"
+            loading={accepting}
             disabled={accepting}
             onClick={() => void handleAccept()}
           >
-            {accepting ? "Joining…" : `Join ${invite.organization.name}`}
+            {accepting ? "Joining organization…" : `Join ${invite.organization.name}`}
           </Button>
         )}
 
         {error ? <p className="text-center text-sm text-red-600">{error}</p> : null}
-      </CardContent>
-    </Card>
+    </AuthGlassCard>
   );
 }

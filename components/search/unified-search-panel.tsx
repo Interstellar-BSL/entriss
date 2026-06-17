@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { Search, UserRound } from "lucide-react";
 
+import { ListSkeleton } from "@/components/shared/loading-state";
 import {
   receptionCard,
   receptionCardBody,
@@ -593,14 +594,7 @@ export const UnifiedSearchPanel = memo(function UnifiedSearchPanel({
         ) : null}
 
         {loading ? (
-          <div className="space-y-2">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-14 animate-pulse rounded-md bg-[var(--surface-muted)]"
-              />
-            ))}
-          </div>
+          <ListSkeleton rows={4} />
         ) : null}
 
         {!loading &&

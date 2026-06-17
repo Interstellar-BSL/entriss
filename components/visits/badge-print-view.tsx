@@ -2,13 +2,13 @@
 
 /**
  * On-screen badge print preview helper (not used by printThermalBadge).
- * Printing uses static HTML via lib/kiosk/badge-print-html.ts.
+ * Printing uses static HTML via lib/badge-print/badge-print-html.ts.
  */
 
 import { useEffect, useRef } from "react";
 
 import { VisitBadgeQr } from "@/components/visits/visit-badge-qr";
-import type { BadgePrintFormat } from "@/lib/kiosk/badge-print-styles";
+import type { BadgePrintFormat } from "@/lib/badge-print";
 import type { ThermalBadgeData } from "@/lib/visits/types";
 import { cn } from "@/lib/utils/cn";
 
@@ -72,7 +72,7 @@ export function BadgePrintView({
     <div
       className={cn("badge-print-view", className)}
       data-format={format}
-      id="badge-print-root"
+      id="badge-print-preview-root"
     >
       <header className="badge-print-header">
         {badge.organization.logoUrl ? (

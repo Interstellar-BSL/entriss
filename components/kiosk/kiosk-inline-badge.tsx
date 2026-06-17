@@ -2,7 +2,7 @@
 
 import { ThermalBadgePreview } from "@/components/visits/thermal-badge-preview";
 import { Button } from "@/components/ui/button";
-import { printThermalBadge } from "@/lib/kiosk/print-thermal-badge";
+import { printBadge } from "@/lib/badge-print";
 import type { ThermalBadgeData } from "@/lib/visits/types";
 
 export function KioskInlineBadge({
@@ -21,9 +21,11 @@ export function KioskInlineBadge({
             type="button"
             className="h-12 min-w-[10rem] text-base"
             onClick={() =>
-              void printThermalBadge(badge).catch((error) => {
-                console.error("[BADGE_PRINT]", error);
-              })
+              void printBadge(badge, { printSource: "kiosk-inline" }).catch(
+                (error) => {
+                  console.error("[BADGE_PRINT]", error);
+                },
+              )
             }
           >
             Print badge

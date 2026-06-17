@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { ListSkeleton } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -129,7 +130,9 @@ export function NotificationCenterPage() {
         </CardHeader>
         <CardContent className="divide-y divide-[var(--border)] p-0">
           {loading ? (
-            <p className="px-4 py-8 text-center text-sm text-[var(--muted)]">Loading…</p>
+            <div className="p-4">
+              <ListSkeleton rows={5} />
+            </div>
           ) : items.length === 0 ? (
             <p className="px-4 py-8 text-center text-sm text-[var(--muted)]">
               No notifications in this filter

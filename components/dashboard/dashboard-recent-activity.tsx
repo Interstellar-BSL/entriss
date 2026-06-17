@@ -141,7 +141,7 @@ export function DashboardRecentActivity() {
       </CardHeader>
       <CardContent className="pt-0">
         {loading ? (
-          <LoadingState label="Loading activity…" />
+          <LoadingState variant="list" label="Loading activity…" />
         ) : error ? (
           <p className="text-sm text-red-600">{error}</p>
         ) : items.length === 0 ? (

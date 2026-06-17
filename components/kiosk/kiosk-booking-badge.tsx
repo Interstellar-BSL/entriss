@@ -7,7 +7,7 @@ import {
   kioskCompactTitle,
   kioskPhaseEnter,
 } from "@/components/kiosk/kiosk-ui";
-import { printThermalBadge } from "@/lib/kiosk/print-thermal-badge";
+import { printBadge } from "@/lib/badge-print";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 import type { ThermalBadgeData } from "@/lib/visits/types";
 import { cn } from "@/lib/utils/cn";
@@ -45,7 +45,10 @@ export function KioskBookingBadge({
           badge={badge}
           photoUrl={photoUrl}
           onPrint={() =>
-            void printThermalBadge(badge, { photoUrl }).catch((error) => {
+            void printBadge(badge, {
+              photoUrl,
+              printSource: "kiosk-booking",
+            }).catch((error) => {
               console.error("[BADGE_PRINT]", error);
             })
           }

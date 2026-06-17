@@ -1,11 +1,17 @@
 import { RequestAccessWizard } from "@/components/request-access/request-access-wizard";
+import { AuthGlassCard, AuthPageHeader } from "@/components/auth/auth-shell";
 
 export default function RequestAccessPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-muted)] px-4 py-10">
-      <div className="w-full max-w-md">
+    <div className="mx-auto w-full max-w-md">
+      <AuthPageHeader
+        title="Request organization access"
+        subtitle="Get your company onboarded in a few quick steps"
+        showLogo
+      />
+      <AuthGlassCard className="p-0">
         <RequestAccessWizard />
-      </div>
+      </AuthGlassCard>
     </div>
   );
 }

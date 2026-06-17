@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { ApiError } from "@/lib/api/client";
 import { getVisitBadge, getVisitBadgeA4 } from "@/lib/api/visits";
-import { printThermalBadge } from "@/lib/kiosk/print-thermal-badge";
+import { printBadge } from "@/lib/badge-print";
 import type { A4BadgeLayout, ThermalBadgeData } from "@/lib/visits/types";
 import type { VisitWithRelations } from "@/lib/services/internal/visit-include";
 
@@ -105,16 +105,17 @@ export function BadgePreviewModal({
       return;
     }
 
-    void printThermalBadge(badge, { format: showA4 ? "a4" : "thermal" }).catch(
-      (error) => {
-        console.error("[BADGE_PRINT]", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to open print preview.",
-        );
-      },
-    );
+    void printBadge(badge, {
+      format: showA4 ? "a4" : "thermal",
+      printSource: "badge-preview-modal",
+    }).catch((error) => {
+      console.error("[BADGE_PRINT]", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to open print preview.",
+      );
+    });
   }
 
   if (!visit) {
@@ -140,7 +141,9 @@ export function BadgePreviewModal({
         {error ? <ErrorState message={error} /> : null}
 
         {!loading && !error && badge && !showA4 ? (
-          <ThermalBadgePreview badge={badge} />
+          <div className="rounded-md border border-[var(--border)] bg-[var(--surface-muted)]/30 p-3">
+            <ThermalBadgePreview badge={badge} />
+          </div>
         ) : null}
 
         {!loading && !error && showA4 && a4Layout ? (

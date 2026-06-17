@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
+import { AuthGlassCard, AuthPageHeader } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
-import { PlatformLogo } from "@/components/branding/platform-logo";
+import { LoadingState } from "@/components/shared/loading-state";
 import { getSessionUser } from "@/lib/auth/session";
 
 export default async function LoginPage() {
@@ -13,24 +14,17 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--background)] px-4">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center text-center">
-          <PlatformLogo size="md" className="mb-4 justify-center" />
-          <h1 className="text-xl font-semibold tracking-tight text-[var(--foreground)]">
-            Sign in to Entriss
-          </h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            Visitor management for your organization
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-sm">
+      <AuthPageHeader
+        title="Sign in to Entriss"
+        subtitle="Visitor management for your organization"
+      />
 
-        <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
-          <Suspense fallback={<p className="text-sm text-[var(--muted)]">Loading…</p>}>
-            <LoginForm />
-          </Suspense>
-        </div>
-      </div>
+      <AuthGlassCard>
+        <Suspense fallback={<LoadingState label="Loading sign in…" />}>
+          <LoginForm />
+        </Suspense>
+      </AuthGlassCard>
     </div>
   );
 }

@@ -39,10 +39,15 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <aside
       data-app-sidebar
-      className="flex h-full w-60 flex-col border-r border-[var(--border)] bg-[var(--card)]"
+      className="flex h-full w-60 flex-col border-r bg-[var(--sidebar-bg)] text-[var(--sidebar-fg)]"
     >
-      <div className="flex h-14 items-center border-b border-[var(--border)] px-5">
-        <PlatformLogo size="sm" onClick={onNavigate} href="/" />
+      <div className="flex h-14 items-center border-b border-[var(--sidebar-border)] px-5">
+        <PlatformLogo
+          size="sm"
+          onClick={onNavigate}
+          href="/"
+          className="[&>span:first-child]:bg-white [&>span:first-child]:text-[#0A0057] [&>span:last-child]:text-white"
+        />
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
@@ -62,10 +67,10 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               href={item.href}
               onClick={onNavigate}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-[var(--surface-muted)] text-[var(--foreground)]"
-                  : "text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]",
+                  ? "border-white bg-[var(--sidebar-active)] font-semibold text-white"
+                  : "border-transparent text-[var(--sidebar-muted)] hover:border-white/40 hover:bg-[var(--sidebar-hover)] hover:text-white",
               )}
             >
               <Icon />
@@ -75,8 +80,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="border-t border-[var(--border)] px-5 py-4">
-        <p className="truncate text-xs font-medium text-[var(--muted)]">
+      <div className="border-t border-[var(--sidebar-border)] px-5 py-4">
+        <p className="truncate text-xs font-medium text-[var(--sidebar-muted)]">
           {footerLabel}
         </p>
       </div>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
 import {
   AnalyticsFilters,
   DEFAULT_ANALYTICS_FILTERS,
@@ -93,11 +94,7 @@ export function AnalyticsDashboard({
       ) : null}
 
       {loading && !data ? (
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="h-16 animate-pulse rounded-md bg-[var(--surface-muted)]" />
-          ))}
-        </div>
+        <DashboardSkeleton />
       ) : data ? (
         <>
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 xl:grid-cols-8">

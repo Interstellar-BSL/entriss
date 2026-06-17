@@ -5,9 +5,10 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 
+import { AuthGlassCard, AuthPageHeader } from "@/components/auth/auth-shell";
+import { LoadingState } from "@/components/shared/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   getPasswordSetupPreview,
   setupPassword,
@@ -82,34 +83,25 @@ function SetupPasswordContent() {
   }
 
   if (loading) {
-    return (
-      <Card>
-        <CardContent className="py-10 text-center text-sm text-[var(--muted)]">
-          Validating setup link…
-        </CardContent>
-      </Card>
-    );
+    return <LoadingState label="Validating setup link…" />;
   }
 
   if (!preview) {
     return (
-      <Card>
-        <CardContent className="space-y-4 py-8 text-center">
-          <h1 className="text-lg font-semibold text-[var(--foreground)]">Setup link unavailable</h1>
-          <p className="text-sm text-[var(--muted)]">
-            {error ?? "This link may be expired, revoked, or already used."}
-          </p>
-          <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
-            Sign in
-          </Link>
-        </CardContent>
-      </Card>
+      <AuthGlassCard className="space-y-4 text-center">
+        <h1 className="text-lg font-semibold text-[var(--foreground)]">Setup link unavailable</h1>
+        <p className="text-sm text-[var(--muted)]">
+          {error ?? "This link may be expired, revoked, or already used."}
+        </p>
+        <Link href="/login" className="text-sm font-medium text-[var(--foreground)] hover:underline">
+          Sign in
+        </Link>
+      </AuthGlassCard>
     );
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-5 py-8">
+    <AuthGlassCard className="space-y-5">
         <div className="text-center">
           <h1 className="text-lg font-semibold text-[var(--foreground)]">
             Set your password
@@ -152,25 +144,26 @@ function SetupPasswordContent() {
               disabled={submitting}
             />
           </div>
-          <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Activating…" : "Activate account"}
+          <Button type="submit" className="w-full" loading={submitting} disabled={submitting}>
+            {submitting ? "Activating account…" : "Activate account"}
           </Button>
         </form>
 
         {error ? <p className="text-center text-sm text-red-600">{error}</p> : null}
-      </CardContent>
-    </Card>
+    </AuthGlassCard>
   );
 }
 
 export function SetupPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--surface-muted)] px-4">
-      <div className="w-full max-w-md">
-        <Suspense fallback={<p className="text-sm text-[var(--muted)]">Loading…</p>}>
-          <SetupPasswordContent />
-        </Suspense>
-      </div>
+    <div className="mx-auto w-full max-w-md">
+      <AuthPageHeader
+        title="Welcome to Entriss"
+        subtitle="Complete your account setup"
+      />
+      <Suspense fallback={<LoadingState label="Loading setup…" />}>
+        <SetupPasswordContent />
+      </Suspense>
     </div>
   );
 }

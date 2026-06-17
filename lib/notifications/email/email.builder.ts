@@ -89,9 +89,25 @@ async function loadVisitEmailContext(ctx: TenantContext, visitId: string) {
           user: { select: { name: true, email: true } },
         },
       },
-      organization: { select: { name: true } },
+      organization: {
+        select: {
+          name: true,
+          organizationSettings: {
+            select: {
+              logoUrl: true,
+              primaryColor: true,
+            },
+          },
+        },
+      },
     },
   });
+}
+
+function visitReferenceLabel(
+  visit: NonNullable<Awaited<ReturnType<typeof loadVisitEmailContext>>>,
+) {
+  return visit.badgeNumber?.trim() || visit.id;
 }
 
 async function buildHostArrivalPayload(
@@ -117,6 +133,7 @@ async function buildHostArrivalPayload(
       scheduledAt: visit.scheduledAt?.toISOString(),
       checkedInAt: visit.checkedInAt?.toISOString(),
       purpose: visit.purpose ?? undefined,
+      visitReference: visitReferenceLabel(visit),
     },
     host: {
       name: formatHostName(visit.host.user),
@@ -127,6 +144,9 @@ async function buildHostArrivalPayload(
       address: visit.branch.address ?? undefined,
     },
     organizationName: visit.organization.name,
+    organizationLogoUrl: visit.organization.organizationSettings?.logoUrl ?? undefined,
+    organizationPrimaryColor:
+      visit.organization.organizationSettings?.primaryColor ?? undefined,
   };
 }
 
@@ -166,6 +186,7 @@ async function buildVisitorPayload(
       checkedInAt: visit.checkedInAt?.toISOString(),
       checkedOutAt: visit.checkedOutAt?.toISOString(),
       purpose: visit.purpose ?? undefined,
+      visitReference: visitReferenceLabel(visit),
       rejectReason: extras?.rejectReason,
       cancelReason: extras?.cancelReason,
       visitDuration:
@@ -182,6 +203,9 @@ async function buildVisitorPayload(
       address: visit.branch.address ?? undefined,
     },
     organizationName: visit.organization.name,
+    organizationLogoUrl: visit.organization.organizationSettings?.logoUrl ?? undefined,
+    organizationPrimaryColor:
+      visit.organization.organizationSettings?.primaryColor ?? undefined,
     qrCode,
   };
 
@@ -230,6 +254,7 @@ async function buildHostApprovalPayloads(
         status: visit.status,
         scheduledAt: visit.scheduledAt?.toISOString(),
         purpose: visit.purpose ?? undefined,
+        visitReference: visitReferenceLabel(visit),
       },
       host: {
         name: formatHostName(visit.host.user),

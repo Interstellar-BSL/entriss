@@ -25,6 +25,7 @@ import { getHostAnalytics } from "@/lib/api/analytics";
 import { toUserFacingErrorMessage } from "@/lib/api/user-facing-errors";
 
 import { HostDetailDrawer } from "@/components/hosts/host-detail-drawer";
+import { TableSkeleton } from "@/components/shared/loading-state";
 
 import {
 
@@ -425,9 +426,7 @@ export function HostsPage() {
         <CardContent className="overflow-x-auto pt-0">
 
           {loading ? (
-
-            <div className="h-32 animate-pulse rounded-md bg-[var(--surface-muted)]" />
-
+            <TableSkeleton rows={8} columns={6} />
           ) : (
 
             <table className="min-w-full text-left text-sm">

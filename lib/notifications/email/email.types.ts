@@ -26,6 +26,7 @@ export interface TransactionalEmailPayload {
     checkedInAt?: string;
     checkedOutAt?: string;
     purpose?: string;
+    visitReference?: string;
     rejectReason?: string;
     cancelReason?: string;
     visitDuration?: string;
@@ -42,6 +43,8 @@ export interface TransactionalEmailPayload {
   };
 
   organizationName?: string;
+  organizationLogoUrl?: string;
+  organizationPrimaryColor?: string;
   qrCode?: string;
   approvalUrl?: string;
   isReminder?: boolean;

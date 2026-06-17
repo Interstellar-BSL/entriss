@@ -19,6 +19,7 @@ export function renderTransactionalEmail(
   const orgLabel = payload.organizationName
     ? escapeHtml(payload.organizationName)
     : "Entriss";
+  const brandColor = payload.organizationPrimaryColor?.trim() || "#18181b";
 
   const headline = escapeHtml(template.headline(payload));
   const intro = escapeHtml(template.intro(payload));
@@ -28,12 +29,16 @@ export function renderTransactionalEmail(
     .join("");
   const footer = escapeHtml(template.footer(payload));
 
+  const logoBlock = payload.organizationLogoUrl
+    ? `<img src="${payload.organizationLogoUrl}" alt="" width="48" height="48" style="display:block;margin:0 auto 12px;border-radius:8px;object-fit:cover;" />`
+    : "";
+
   const qrBlock =
     template.includeQr && payload.qrCode
       ? `<div style="margin:24px 0;text-align:center;">
-           <p style="margin:0 0 12px;font-weight:600;">Your check-in QR code</p>
+           <p style="margin:0 0 12px;font-weight:600;color:${escapeHtml(brandColor)};">Your check-in QR code</p>
            <img src="${payload.qrCode}" alt="Visit QR code" width="220" height="220" style="border:1px solid #e5e7eb;border-radius:8px;" />
-           <p style="margin:12px 0 0;font-size:12px;color:#6b7280;">Present this code at reception</p>
+           <p style="margin:12px 0 0;font-size:12px;color:#6b7280;">Present this code at reception when you arrive</p>
          </div>`
       : "";
 
@@ -41,7 +46,7 @@ export function renderTransactionalEmail(
     payload.approvalUrl &&
     (payload.type === "APPROVAL_REQUEST" || payload.type === "APPROVAL_REMINDER")
       ? `<p style="margin:24px 0;">
-           <a href="${escapeHtml(payload.approvalUrl)}" style="display:inline-block;padding:12px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">
+           <a href="${escapeHtml(payload.approvalUrl)}" style="display:inline-block;padding:12px 20px;background:${escapeHtml(brandColor)};color:#fff;text-decoration:none;border-radius:6px;font-weight:600;">
              Review visit request
            </a>
          </p>`
@@ -55,9 +60,10 @@ export function renderTransactionalEmail(
         <td align="center" style="padding:32px 16px;">
           <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
             <tr>
-              <td style="padding:28px 32px;">
+              <td style="padding:28px 32px;border-top:4px solid ${escapeHtml(brandColor)};">
+                ${logoBlock}
                 <p style="margin:0 0 8px;font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;">${orgLabel}</p>
-                <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;">${headline}</h1>
+                <h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:${escapeHtml(brandColor)};">${headline}</h1>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">${intro}</p>
                 <ul style="margin:0 0 16px;padding-left:20px;font-size:14px;line-height:1.7;">${bullets}</ul>
                 ${qrBlock}

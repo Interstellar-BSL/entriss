@@ -42,10 +42,10 @@ export function Modal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 motion-safe:animate-alive-fade-in">
       <button
         type="button"
-        className="absolute inset-0 bg-[var(--foreground)]/40"
+        className="absolute inset-0 bg-[var(--foreground)]/40 motion-safe:animate-alive-fade-in"
         aria-label="Close modal"
         onClick={onClose}
       />
@@ -54,11 +54,11 @@ export function Modal({
         aria-modal
         aria-labelledby="modal-title"
         className={cn(
-          "relative z-10 w-full max-w-md rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-xl",
+          "relative z-10 flex max-h-[min(90vh,100%)] w-full max-w-md flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-xl motion-safe:animate-alive-modal-in",
           className,
         )}
       >
-        <div className="border-b border-[var(--border)] px-5 py-4">
+        <div className="shrink-0 border-b border-[var(--border)] px-5 py-4">
           <h2
             id="modal-title"
             className="text-base font-semibold text-[var(--foreground)]"
@@ -66,7 +66,7 @@ export function Modal({
             {title}
           </h2>
         </div>
-        <div className="px-5 py-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
       </div>
     </div>
   );
