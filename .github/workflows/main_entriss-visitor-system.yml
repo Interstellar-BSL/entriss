@@ -37,20 +37,20 @@ jobs:
         run: |
           mkdir -p deploy
 
-          # ✅ Standalone server (includes minimal node_modules)
+          # 1. Copy standalone server
           cp -r .next/standalone deploy/
           
-          # ✅ Static files required by Next
-          cp -r .next/static deploy/.next/
+          # 2. Create .next directory explicitly
+          mkdir -p deploy/.next
           
-          # ✅ Public assets
+          # 3. Copy *contents* of static (not the folder itself twice)
+          cp -r .next/static/* deploy/.next/static/
+          
+          # 4. Copy public assets
           cp -r public deploy/ || true
           
-          # Optional (some apps need it)
-          cp package.json deploy/
-          
-          echo "✅ Deployment folder ready"
-          ls -la deploy
+          echo "✅ Final structure:"
+          find deploy -maxdepth 3 -type d
 
       - name: Create deployment zip
         run: |
