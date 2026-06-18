@@ -41,12 +41,25 @@ jobs:
           echo "✅ Standalone prepared"
           ls -la .next/standalone
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: .next/standalone
-          retention-days: 1
+      - name: Verify standalone contents
+        run: |
+          echo "===== STANDALONE ROOT ====="
+          ls -la .next/standalone
+      
+          echo ""
+          echo "===== STANDALONE .NEXT ====="
+          ls -la .next/standalone/.next
+      
+          echo ""
+          echo "===== BUILD_ID ====="
+          find .next/standalone -name BUILD_ID
+      
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                name: node-app
+                path: .next/standalone
+                retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
