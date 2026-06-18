@@ -37,16 +37,18 @@ jobs:
         run: |
           mkdir -p deploy
 
-          # REQUIRED for production runtime
-          cp -r .next deploy/
+          # ✅ Standalone server (includes minimal node_modules)
+          cp -r .next/standalone deploy/
+          
+          # ✅ Static files required by Next
+          cp -r .next/static deploy/.next/
+          
+          # ✅ Public assets
           cp -r public deploy/ || true
-
-          # IMPORTANT files
+          
+          # Optional (some apps need it)
           cp package.json deploy/
-          cp package-lock.json deploy/
-          cp next.config.ts deploy/ || true
-          cp tsconfig.json deploy/ || true
-
+          
           echo "✅ Deployment folder ready"
           ls -la deploy
 
