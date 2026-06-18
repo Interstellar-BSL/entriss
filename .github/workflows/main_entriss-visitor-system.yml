@@ -40,17 +40,20 @@ jobs:
           # 1. Copy standalone server
           cp -r .next/standalone deploy/
           
-          # 2. Create .next directory explicitly
+          # 2. Create .next folder INSIDE deploy first
           mkdir -p deploy/.next
           
-          # 3. Copy *contents* of static (not the folder itself twice)
-          cp -r .next/static/* deploy/.next/static/
+          # 3. Copy static assets INTO it
+          cp -r .next/static deploy/.next/
           
           # 4. Copy public assets
           cp -r public deploy/ || true
           
-          echo "✅ Final structure:"
-          find deploy -maxdepth 3 -type d
+          # Optional but fine
+          cp package.json deploy/
+          
+          echo "✅ Deployment folder ready"
+          ls -R deploy
 
       - name: Create deployment zip
         run: |
