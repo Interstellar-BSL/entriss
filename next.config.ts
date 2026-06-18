@@ -1,12 +1,9 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig: import('next').NextConfig = {
+  output: 'standalone',
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  output: 'standalone',   // ← This is the key
-
-  // Optional but recommended for Azure
   images: {
-    unoptimized: true,      // Azure doesn't support Next.js image optimization easily
+    unoptimized: true,
   },
 };
 
