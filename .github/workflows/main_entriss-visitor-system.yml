@@ -32,14 +32,21 @@ jobs:
       # === CRITICAL: Prepare standalone folder correctly ===
       - name: Prepare standalone deployment
         run: |
-          # Copy public folder and static files if they exist
-          if [ -d "public" ]; then
-            cp -r public .next/standalone/
+          cd .next/standalone
+          
+          # Copy public folder
+          if [ -d "../../public" ]; then
+            cp -r ../../public ./
           fi
-          if [ -d ".next/static" ]; then
-            mkdir -p .next/standalone/.next
-            cp -r .next/static .next/standalone/.next/
+          
+          # Copy static files
+          if [ -d "../../.next/static" ]; then
+            mkdir -p ./.next/static
+            cp -r ../../.next/static ./.next/
           fi
+          
+          echo "Standalone folder prepared with public and static files"
+          ls -la
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
