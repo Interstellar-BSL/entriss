@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
+import { AccountSecurityPanel } from "@/components/settings/account-security-panel";
 import { BranchSettingsIndex } from "@/components/settings/branch-settings-index";
 import { FeatureFlagsPanel } from "@/components/settings/feature-flags-panel";
 import { OrgSettingsForm } from "@/components/settings/org-settings-form";
@@ -11,7 +12,7 @@ import { TeamPanel } from "@/components/settings/team-panel";
 import { PERMISSIONS } from "@/lib/rbac/permissions";
 import { cn } from "@/lib/utils/cn";
 
-type SettingsTab = "organization" | "team" | "branches" | "features";
+type SettingsTab = "account" | "organization" | "team" | "branches" | "features";
 
 export function SettingsPage() {
   const { data: session } = useSession();
@@ -23,6 +24,7 @@ export function SettingsPage() {
   const canManageFlags = permissions.includes(PERMISSIONS.USER_MANAGE);
 
   const tabs: Array<{ id: SettingsTab; label: string; visible: boolean }> = [
+    { id: "account", label: "Account", visible: true },
     { id: "organization", label: "Organization", visible: true },
     { id: "team", label: "Team", visible: canManageTeam },
     { id: "branches", label: "Branches", visible: canManageBranches },
@@ -84,6 +86,8 @@ export function SettingsPage() {
           ))}
         </nav>
       ) : null}
+
+      {activeTab === "account" ? <AccountSecurityPanel /> : null}
 
       {activeTab === "organization" ? (
         <OrgSettingsForm canEdit={canEditOrg} />

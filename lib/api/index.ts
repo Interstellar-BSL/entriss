@@ -19,4 +19,4 @@ export {
 } from "./response";
 export type { ApiErrorBody, ApiFailureBody, ApiSuccessBody } from "./response";
 export { assertOrgScope, assertOrgScopeOptional, OrgScopeViolationError } from "./assert-org-scope";
-export { withTenant, withTenantParams, withRequestContext, withRequestContextParams } from "./with-tenant";
+export { withTenant, withTenantParams, withRequestContext, withRequestContextParams, withSession } from "./with-tenant";

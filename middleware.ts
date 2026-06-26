@@ -229,6 +229,8 @@ export const config = {
     "/invite/:path*",
     "/accept-invite",
     "/setup-password",
+    "/forgot-password",
+    "/reset-password",
     "/kiosk",
     "/kiosk/:path*",
     "/dashboard",

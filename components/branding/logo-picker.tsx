@@ -30,6 +30,12 @@ export function LogoPicker({
     organizationName?.trim().charAt(0).toUpperCase() ?? "E";
   const displayUrl = previewUrl ?? (value.trim() || null);
 
+  const resetFileInput = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, []);
+
   const processFile = useCallback(
     async (file: File) => {
       setError(null);
@@ -44,9 +50,10 @@ export function LogoPicker({
         );
       } finally {
         setProcessing(false);
+        resetFileInput();
       }
     },
-    [],
+    [resetFileInput],
   );
 
   async function handleFiles(files: FileList | null) {
@@ -65,12 +72,19 @@ export function LogoPicker({
 
     onChange(previewUrl);
     setPreviewUrl(null);
+    resetFileInput();
+  }
+
+  function handleDiscardPreview() {
+    setPreviewUrl(null);
+    resetFileInput();
   }
 
   function handleRemove() {
     onChange("");
     setPreviewUrl(null);
     setError(null);
+    resetFileInput();
   }
 
   return (
@@ -156,7 +170,7 @@ export function LogoPicker({
                 size="sm"
                 variant="ghost"
                 disabled={disabled}
-                onClick={() => setPreviewUrl(null)}
+                onClick={handleDiscardPreview}
               >
                 Discard preview
               </Button>

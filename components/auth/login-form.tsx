@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
@@ -11,6 +12,7 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
+  const resetSuccess = searchParams.get("reset") === "success";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -85,6 +87,12 @@ export function LoginForm() {
         />
       </div>
 
+      {resetSuccess ? (
+        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          Your password was reset successfully. Sign in with your new password.
+        </p>
+      ) : null}
+
       {error ? (
         <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 ring-1 ring-red-200">
           {error}
@@ -94,6 +102,15 @@ export function LoginForm() {
       <Button type="submit" className="w-full" size="lg" loading={loading} disabled={loading}>
         {loading ? "Signing in…" : "Sign in"}
       </Button>
+
+      <p className="text-center text-sm">
+        <Link
+          href="/forgot-password"
+          className="font-medium text-[var(--foreground)] hover:underline"
+        >
+          Forgot password?
+        </Link>
+      </p>
 
       <p className="text-center text-sm text-[var(--muted)]">
         New organization?{" "}

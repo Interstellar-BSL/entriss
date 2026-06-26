@@ -21,6 +21,8 @@ export const PUBLIC_UI_PATH_PREFIXES = [
   "/invite",
   "/accept-invite",
   "/setup-password",
+  "/forgot-password",
+  "/reset-password",
 ] as const;
 
 export interface MiddlewareAuthClaims {
@@ -65,6 +67,18 @@ export function isPublicAuthApiPath(pathname: string, method = "GET"): boolean {
     return true;
   }
 
+  if (pathname === "/api/v1/auth/forgot-password" && method === "POST") {
+    return true;
+  }
+
+  if (pathname === "/api/v1/auth/reset-password" && method === "POST") {
+    return true;
+  }
+
+  if (pathname === "/api/v1/auth/reset-password/preview" && method === "GET") {
+    return true;
+  }
+
   return false;
 }
 
@@ -106,6 +120,10 @@ export function isOrgContextExemptApiPath(
   }
 
   if (pathname.startsWith("/api/v1/admin")) {
+    return true;
+  }
+
+  if (pathname === "/api/v1/auth/change-password" && method === "POST") {
     return true;
   }
 

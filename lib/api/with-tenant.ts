@@ -1,5 +1,6 @@
 import {
   requireRequestContext,
+  requireSessionUser,
   requireTenantContext,
 } from "@/lib/auth/session";
 import type { RequestContext } from "@/lib/tenant/request-context";
@@ -83,6 +84,22 @@ export function withRequestContextParams<P extends Record<string, string>>(
       const ctx = await requireRequestContext(request);
       const params = await routeContext.params;
       return await handler(request, ctx, params);
+    } catch (err) {
+      return handleApiError(err);
+    }
+  };
+}
+
+type SessionHandler = (
+  request: Request,
+  user: Awaited<ReturnType<typeof requireSessionUser>>,
+) => Promise<Response>;
+
+export function withSession(handler: SessionHandler) {
+  return async (request: Request): Promise<Response> => {
+    try {
+      const user = await requireSessionUser();
+      return await handler(request, user);
     } catch (err) {
       return handleApiError(err);
     }

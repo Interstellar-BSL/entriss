@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -22,7 +22,12 @@ export function BrandMark({
   imageClassName?: string;
 }) {
   const [failed, setFailed] = useState(false);
-  const showImage = Boolean(logoUrl?.trim()) && !failed;
+  const normalizedLogoUrl = logoUrl?.trim() || null;
+  const showImage = Boolean(normalizedLogoUrl) && !failed;
+
+  useEffect(() => {
+    setFailed(false);
+  }, [normalizedLogoUrl]);
 
   return (
     <div
@@ -35,7 +40,8 @@ export function BrandMark({
       {showImage ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={logoUrl!}
+          key={normalizedLogoUrl}
+          src={normalizedLogoUrl!}
           alt={alt}
           className={cn("h-full w-full object-cover object-center", imageClassName)}
           onError={() => setFailed(true)}
